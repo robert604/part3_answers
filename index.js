@@ -1,4 +1,4 @@
-// 3.1
+// 3.2
 const { request, response } = require("express")
 const express = require("express")
 
@@ -34,6 +34,13 @@ app.get('/',(req,res)=>{
 
 app.get('/api/persons',(req,res)=>{
     res.json(persons)
+})
+
+app.get('/info',(req,res)=>{
+    const str = `<p>Phonebook has info for ${persons.length} people</p>` + '<p>' + new Date().toString() +'</p>'
+    //res.send(`Phonebook has info for ${persons.length} people`)
+    //res.send(new Date().toString())
+    res.send(str)
 })
 
 const PORT = 3001
