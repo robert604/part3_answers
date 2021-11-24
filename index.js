@@ -37,33 +37,30 @@ app.get('/api/persons',(req,res)=>{
 })
 
 app.get('/api/persons/:id',(req,res)=>{
+  const id = Number(req.params.id)
+  const person = persons.find(person=>person.id===id)
+  if(person) {
+      res.json(person)
+  } else {
+      res.status(404).end()
+  }
+})
+
+app.delete('/api/persons/:id',(req,res)=>{
     const idToDelete = Number(req.params.id)
     const idsAndIndexes = persons.map((person,i)=>{return {id:person.id,i:i}})
     const forDeletion = idsAndIndexes.find(({id})=>idToDelete===id)
-    const indexForDeletion = forDeletion.i
     if(forDeletion) {
-        res.json(persons[indexForDeletion])
-        res.status(204)
+        //res.json(persons[forDeletion.i])
+        persons.splice(forDeletion.i,1)
+        res.status(204).end()
     } else {
         res.status(404).end()
     }
 })
 
-app.delete('/api/persons/:id',(req,res)=>{
-  const id = Number(req.params.id)  
-  const person = persons.find(person=>person.id===id)
-  if(person){
-    persons = persons.filter(person=>person.id!==id)
-    res.status(204).end()
-  } else {
-    res.status(404).end()
-  }
-})
-
 app.get('/info',(req,res)=>{
     const str = `<p>Phonebook has info for ${persons.length} people</p>` + '<p>' + new Date().toString() +'</p>'
-    //res.send(`Phonebook has info for ${persons.length} people`)
-    //res.send(new Date().toString())
     res.send(str)
 })
 
