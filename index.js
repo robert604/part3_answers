@@ -1,4 +1,4 @@
-// 3.5
+// 3.6
 const { request, response } = require("express")
 const express = require("express")
 
@@ -38,7 +38,6 @@ app.get('/info',(req,res)=>{
 })
 
 app.get('/api/persons',(req,res)=>{
-  console.log("in get all")
     res.json(persons)
 })
 
@@ -57,7 +56,6 @@ app.delete('/api/persons/:id',(req,res)=>{
     const idsAndIndexes = persons.map((person,i)=>{return {id:person.id,i:i}})
     const forDeletion = idsAndIndexes.find(({id})=>idToDelete===id)
     if(forDeletion) {
-        //res.json(persons[forDeletion.i])
         persons.splice(forDeletion.i,1)
         res.status(204).end()
     } else {
@@ -68,9 +66,19 @@ app.delete('/api/persons/:id',(req,res)=>{
 app.use(express.json())
 
 app.post('/api/persons',(req,res)=>{
+  const newItem = req.body
+  if(!("name" in newItem) || !("number" in newItem)) {
+    res.status(400).json({error: "Both name and number must be provided"})
+    return
+  }
+  const existing = persons.find(person=>person.name===newItem.name)
+  if(existing) {
+    res.status(400).json({error: "Name must be unique"})
+    return
+  }
+
   const newId = Math.floor(Math.random()*1000000)
-  const toAdd = {...req.body, id: newId}
-  console.log("in post",toAdd)
+  const toAdd = {...newItem, id: newId}
   persons.push(toAdd)
   res.json(toAdd)
 })
