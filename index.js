@@ -1,4 +1,4 @@
-// 3.3
+// 3.4
 const { request, response } = require("express")
 const express = require("express")
 
@@ -37,13 +37,27 @@ app.get('/api/persons',(req,res)=>{
 })
 
 app.get('/api/persons/:id',(req,res)=>{
-    const id = Number(req.params.id)
-    const person = persons.find(person=>person.id===id)
-    if(person) {
-        res.json(person)
+    const idToDelete = Number(req.params.id)
+    const idsAndIndexes = persons.map((person,i)=>{return {id:person.id,i:i}})
+    const forDeletion = idsAndIndexes.find(({id})=>idToDelete===id)
+    const indexForDeletion = forDeletion.i
+    if(forDeletion) {
+        res.json(persons[indexForDeletion])
+        res.status(204)
     } else {
         res.status(404).end()
     }
+})
+
+app.delete('/api/persons/:id',(req,res)=>{
+  const id = Number(req.params.id)  
+  const person = persons.find(person=>person.id===id)
+  if(person){
+    persons = persons.filter(person=>person.id!==id)
+    res.status(204).end()
+  } else {
+    res.status(404).end()
+  }
 })
 
 app.get('/info',(req,res)=>{
