@@ -1,4 +1,4 @@
-// 3.4
+// 3.5
 const { request, response } = require("express")
 const express = require("express")
 
@@ -32,7 +32,13 @@ app.get('/',(req,res)=>{
     res.send('<h1>Hello There!</h1>')
 })
 
+app.get('/info',(req,res)=>{
+  const str = `<p>Phonebook has info for ${persons.length} people</p>` + '<p>' + new Date().toString() +'</p>'
+  res.send(str)
+})
+
 app.get('/api/persons',(req,res)=>{
+  console.log("in get all")
     res.json(persons)
 })
 
@@ -59,13 +65,18 @@ app.delete('/api/persons/:id',(req,res)=>{
     }
 })
 
-app.get('/info',(req,res)=>{
-    const str = `<p>Phonebook has info for ${persons.length} people</p>` + '<p>' + new Date().toString() +'</p>'
-    res.send(str)
+app.use(express.json())
+
+app.post('/api/persons',(req,res)=>{
+  const newId = Math.floor(Math.random()*1000000)
+  const toAdd = {...req.body, id: newId}
+  console.log("in post",toAdd)
+  persons.push(toAdd)
+  res.json(toAdd)
 })
 
 const PORT = 3001
 
 app.listen(PORT,()=>{
-    console.log('Server running on port ${PORT}')
+    console.log(`Server running on port ${PORT}`)
 })
