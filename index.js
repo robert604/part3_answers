@@ -1,10 +1,11 @@
-// 3.7
-const { request, response } = require("express")
+// 3.8
 const express = require("express")
 const morgan = require('morgan')
 
 const app = express()
-app.use(morgan('tiny'))
+app.use(morgan(function(tokens,req,res){
+  return JSON.stringify(req.body)
+}))
 
 const persons = [
     { 
