@@ -1,8 +1,10 @@
-// 3.6
+// 3.7
 const { request, response } = require("express")
 const express = require("express")
+const morgan = require('morgan')
 
 const app = express()
+app.use(morgan('tiny'))
 
 const persons = [
     { 
