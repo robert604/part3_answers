@@ -1,11 +1,13 @@
-// 3.8
+// 3.9
 const express = require("express")
 const morgan = require('morgan')
+const cors =  require('cors')
 
 const app = express()
 app.use(morgan(function(tokens,req,res){
   return JSON.stringify(req.body)
 }))
+app.use(cors())
 
 const persons = [
     { 
