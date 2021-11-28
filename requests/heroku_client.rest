@@ -1,0 +1,15 @@
+GET http://arcane-river-56218.herokuapp.com/info
+###
+GET http://arcane-river-56218.herokuapp.com/api/persons
+
+###
+DELETE http://arcane-river-56218.herokuapp.com/api/persons/3
+
+###
+POST http://arcane-river-56218.herokuapp.com/api/persons
+Content-Type: application/json
+
+{
+    "name": "A Name",
+    "number": "99999"
+}
