@@ -5,7 +5,6 @@ const url = `mongodb+srv://pbuser1:${password}@phonebook.qhnlx.mongodb.net/myFir
 
 function makePersonModel(persondb) {
     const personSchema = new persondb.Schema({
-        id: Number,
         name: String,
         number: String
     })
@@ -18,7 +17,6 @@ function addPerson(name,number) {
     const Person = makePersonModel(mongoose)
     const id = Math.floor(Math.random()*1000000)
     const person = new Person({
-        id: id,
         name: name,
         number: number
     })    
@@ -45,4 +43,5 @@ if(process.argv.length==2) {
 } else if(process.argv.length==3) {
     findPersons({})
 }
+
 
