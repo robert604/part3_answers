@@ -1,9 +1,10 @@
 GET http://localhost:3001/info
 ###
 GET http://localhost:3001/api/persons
-
 ###
-DELETE http://localhost:3001/api/persons/3
+GET http://localhost:3001/api/persons/61a63f74fa888ff20a91669b
+###
+DELETE http://localhost:3001/api/persons/61a63f74fa888ff20a91669b
 
 ###
 POST http://localhost:3001/api/persons

@@ -1,4 +1,4 @@
-// 3.13
+// 3.14
 require('dotenv').config()
 const express = require("express")
 const morgan = require('morgan')
@@ -11,7 +11,7 @@ app.use(morgan(function(tokens,req,res){
 }))
 app.use(cors())
 app.use(express.static('build'))
-
+app.use(express.json())
 /*const persons = [
     { 
       "id": 1,
@@ -45,28 +45,30 @@ app.get('/',(req,res)=>{
   res.send(str)
 })*/
 
-app.get('/api/persons',(req,res)=>{
-  console.log("in get")  
+app.get('/api/persons',(req,res)=>{ 
   connect().then(result=>{
-    console.log("in get 0")
     Person.find({}).then(persons=>{
-      console.log("in get 1")
         res.json(persons)      
-        closeConnection()
+        closeConnection()       
     })
   })  
 })
-/*
-app.get('/api/persons/:id',(req,res)=>{
-  const id = Number(req.params.id)
-  const person = persons.find(person=>person.id===id)
-  if(person) {
-      res.json(person)
-  } else {
-      res.status(404).end()
-  }
-})
 
+app.get('/api/persons/:id',(req,res)=>{
+  const id = req.params.id
+  connect().then(result=>{
+    Person.find({}).then(persons=>{
+      const found = persons.find(person=>person._id.toString()===id)    
+      if(found) {
+        res.json(found)
+      } else {
+          res.status(404).end()
+      }
+      closeConnection()
+    })
+  }) 
+})
+/*
 app.delete('/api/persons/:id',(req,res)=>{
     const idToDelete = Number(req.params.id)
     const idsAndIndexes = persons.map((person,i)=>{return {id:person.id,i:i}})
@@ -79,26 +81,21 @@ app.delete('/api/persons/:id',(req,res)=>{
     }
 })
 */
-app.use(express.json())
-/*
-app.post('/api/persons',(req,res)=>{
-  const newItem = req.body
-  if(!("name" in newItem) || !("number" in newItem)) {
-    res.status(400).json({error: "Both name and number must be provided"})
-    return
-  }
-  const existing = persons.find(person=>person.name===newItem.name)
-  if(existing) {
-    res.status(400).json({error: "Name must be unique"})
-    return
-  }
 
-  const newId = Math.floor(Math.random()*1000000)
-  const toAdd = {...newItem, id: newId}
-  persons.push(toAdd)
-  res.json(toAdd)
+app.post('/api/persons',(req,res)=>{
+  const newInfo = req.body
+  connect().then(result=>{
+    const person = new Person({
+      name: newInfo.name,
+      number: newInfo.number
+    })    
+    person.save().then(result=>{
+      res.json(result)
+      closeConnection()
+    })
+  })  
 })
-*/
+
 const PORT = process.env.PORT
 
 app.listen(PORT,()=>{
