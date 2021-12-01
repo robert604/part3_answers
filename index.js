@@ -1,17 +1,19 @@
-// 3.14
 require('dotenv').config()
 const express = require("express")
+const app = express()
 const morgan = require('morgan')
 const cors =  require('cors')
+
+app.use(express.static('build'))
+app.use(express.json())
 const {Person,connect,closeConnection} = require('./models/person')
 
-const app = express()
+
 app.use(morgan(function(tokens,req,res){
   return JSON.stringify(req.body)
 }))
 app.use(cors())
-app.use(express.static('build'))
-app.use(express.json())
+
 /*const persons = [
     { 
       "id": 1,
@@ -57,30 +59,36 @@ app.get('/api/persons',(req,res)=>{
 app.get('/api/persons/:id',(req,res)=>{
   const id = req.params.id
   connect().then(result=>{
-    Person.find({}).then(persons=>{
-      const found = persons.find(person=>person._id.toString()===id)    
-      if(found) {
-        res.json(found)
+    Person.findById(id).then(person=>{ 
+      if(person) {
+        res.json(person)
       } else {
           res.status(404).end()
       }
       closeConnection()
+    }).catch(error=>{
+      res.status(500).end()
     })
   }) 
 })
-/*
+
 app.delete('/api/persons/:id',(req,res)=>{
-    const idToDelete = Number(req.params.id)
-    const idsAndIndexes = persons.map((person,i)=>{return {id:person.id,i:i}})
-    const forDeletion = idsAndIndexes.find(({id})=>idToDelete===id)
-    if(forDeletion) {
-        persons.splice(forDeletion.i,1)
+  const id = req.params.id
+  connect().then(result=>{
+    Person.findByIdAndDelete(id).then(result=>{ 
+      if(result) {
         res.status(204).end()
-    } else {
+      } else {
         res.status(404).end()
-    }
+      }
+      closeConnection()
+    }).catch(error=>{
+      console.log(error)
+      res.status(500).end()
+    })
+  }) 
 })
-*/
+
 
 app.post('/api/persons',(req,res)=>{
   const newInfo = req.body
