@@ -1,7 +1,9 @@
-// 3.10
+// 3.13
+require('dotenv').config()
 const express = require("express")
 const morgan = require('morgan')
 const cors =  require('cors')
+const {Person,connect,closeConnection} = require('./models/person')
 
 const app = express()
 app.use(morgan(function(tokens,req,res){
@@ -10,7 +12,7 @@ app.use(morgan(function(tokens,req,res){
 app.use(cors())
 app.use(express.static('build'))
 
-const persons = [
+/*const persons = [
     { 
       "id": 1,
       "name": "Arto Hellas", 
@@ -31,32 +33,42 @@ const persons = [
       "name": "Mary Poppendieck", 
       "number": "39-23-6423122"
     }
-]
+]*/
 
 
 app.get('/',(req,res)=>{
     res.send('<h1>Hello There!</h1>')
 })
 
-app.get('/info',(req,res)=>{
+/*app.get('/info',(req,res)=>{
   const str = `<p>Phonebook has info for ${persons.length} people</p>` + '<p>' + new Date().toString() +'</p>'
   res.send(str)
-})
+})*/
 
-app.get('/api/persons',(req,res)=>{
-    res.json(persons)
+app.get('/api/persons',(req,res)=>{  
+  connect().then(result=>{
+    Person.find({}).then(persons=>{
+        res.json(persons)      
+        closeConnection()
+    })
+  })  
 })
 
 app.get('/api/persons/:id',(req,res)=>{
-  const id = Number(req.params.id)
-  const person = persons.find(person=>person.id===id)
-  if(person) {
-      res.json(person)
-  } else {
-      res.status(404).end()
-  }
+  const id = req.params.id
+  connect().then(result=>{
+    Person.find({}).then(persons=>{
+      const found = persons.find(person=>person._id.toString()===id)    
+      if(found) {
+        res.json(found)
+      } else {
+          res.status(404).end()
+      }
+      closeConnection()
+    })
+  }) 
 })
-
+/*
 app.delete('/api/persons/:id',(req,res)=>{
     const idToDelete = Number(req.params.id)
     const idsAndIndexes = persons.map((person,i)=>{return {id:person.id,i:i}})
@@ -68,9 +80,9 @@ app.delete('/api/persons/:id',(req,res)=>{
         res.status(404).end()
     }
 })
-
+*/
 app.use(express.json())
-
+/*
 app.post('/api/persons',(req,res)=>{
   const newItem = req.body
   if(!("name" in newItem) || !("number" in newItem)) {
@@ -88,8 +100,8 @@ app.post('/api/persons',(req,res)=>{
   persons.push(toAdd)
   res.json(toAdd)
 })
-
-const PORT = process.env.PORT || 3001
+*/
+const PORT = process.env.PORT
 
 app.listen(PORT,()=>{
     console.log(`Server running on port ${PORT}`)
