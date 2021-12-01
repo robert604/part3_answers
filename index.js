@@ -14,49 +14,33 @@ app.use(morgan(function(tokens,req,res){
 }))
 app.use(cors())
 
-/*const persons = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]*/
+const errorHandler = (error,req,res,next)=>{
+  console.log("in errorhandler",error.name)
+  console.error(error.message)
+  if(error.name==='CastError') {
+    return res.status(400).send({error:'malformed id'})
+  }
+  next(error)
+}
+
 
 
 app.get('/',(req,res)=>{
     res.send('<h1>Hello There!</h1>')
 })
 
-/*app.get('/info',(req,res)=>{
-  const str = `<p>Phonebook has info for ${persons.length} people</p>` + '<p>' + new Date().toString() +'</p>'
-  res.send(str)
-})*/
-
 app.get('/api/persons',(req,res)=>{ 
   connect().then(result=>{
     Person.find({}).then(persons=>{
         res.json(persons)      
         closeConnection()       
-    })
+      }).catch(error=>{
+        next(error)
+      })
   })  
 })
 
-app.get('/api/persons/:id',(req,res)=>{
+app.get('/api/persons/:id',(req,res,next)=>{
   const id = req.params.id
   connect().then(result=>{
     Person.findById(id).then(person=>{ 
@@ -67,7 +51,7 @@ app.get('/api/persons/:id',(req,res)=>{
       }
       closeConnection()
     }).catch(error=>{
-      res.status(500).end()
+      next(error)
     })
   }) 
 })
@@ -83,12 +67,10 @@ app.delete('/api/persons/:id',(req,res)=>{
       }
       closeConnection()
     }).catch(error=>{
-      console.log(error)
-      res.status(500).end()
+      next(error)
     })
   }) 
 })
-
 
 app.post('/api/persons',(req,res)=>{
   const newInfo = req.body
@@ -101,8 +83,14 @@ app.post('/api/persons',(req,res)=>{
       res.json(result)
       closeConnection()
     })
-  })  
+  }).catch(error=>{
+    next(error)
+  }) 
 })
+
+
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 
