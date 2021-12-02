@@ -15,10 +15,10 @@ app.use(morgan(function(tokens,req,res){
 app.use(cors())
 
 const errorHandler = (error,req,res,next)=>{
-  console.log("in errorhandler",error.name)
-  console.error(error.message)
   if(error.name==='CastError') {
     return res.status(400).send({error:'malformed id'})
+  } else if(error.name==="ValidationError") {
+    return res.status(400).json({error: error.message})
   }
   next(error)
 }
@@ -113,10 +113,10 @@ app.post('/api/persons',(req,res,next)=>{
     person.save().then(result=>{
       res.json(result)
       closeConnection()
+    }).catch(error=>{
+      next(error)
     })
-  }).catch(error=>{
-    next(error)
-  }) 
+  })
 })
 
 
