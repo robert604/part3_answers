@@ -74,7 +74,7 @@ app.put('/api/persons/:id',(req,res,next)=>{
   const id = req.params.id
   const update = req.body
   connect().then(result=>{
-    Person.findByIdAndUpdate(id,update,{new:true}).then(person=>{
+    Person.findByIdAndUpdate(id,update,{new:true,runValidators:true}).then(person=>{
       if(person){
         res.json(person)
       } else {
