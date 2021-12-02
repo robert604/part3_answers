@@ -29,11 +29,18 @@ app.get('/',(req,res,next)=>{
     res.send('<h1>Hello There!</h1>')
 })
 
-/*app.get('/api/persons',(req,res,next)=>{
-  console.log("query",req.query)
-  //console.log("body",req.body)
-  next()
-})*/
+
+app.get('/info',(req,res,next)=>{
+  connect().then(response=>{
+    Person.find({}).then(persons=>{
+      const str = `<p>Phonebook has info for ${persons.length} people</p>` + '<p>' + new Date().toString() +'</p>'
+      res.send(str)
+      closeConnection()
+    }).catch(error=>{
+      next(error)
+    })
+  })
+})
 
 app.get('/api/persons',(req,res,next)=>{
   const query = req.query
