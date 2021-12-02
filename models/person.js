@@ -1,12 +1,6 @@
 const mongoose = require('mongoose')
 const url = process.env.MONGODB_URI
 
-/*mongoose.connect(url).then(result=>{
-    console.log('connected to MongoDB')
-}).catch(error=>{
-    console.log('error connecting to MongoDB:',error.message)
-})*/
-
 const personSchema = new mongoose.Schema({
     name: String,
     number: String
@@ -28,15 +22,5 @@ function connect() {
 function closeConnection() {
     return mongoose.connection.close()
 }
-
-/*
-function findPersons(findParams) {
-    mongoose.connect(url)
-    Person.find(findParams).then(persons=>{
-        mongoose.connection.close()
-        return persons
-    })
-}
-*/
 
 module.exports = {Person,connect,closeConnection}

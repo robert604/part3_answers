@@ -25,18 +25,25 @@ const errorHandler = (error,req,res,next)=>{
 
 
 
-app.get('/',(req,res)=>{
+app.get('/',(req,res,next)=>{
     res.send('<h1>Hello There!</h1>')
 })
 
-app.get('/api/persons',(req,res)=>{ 
+/*app.get('/api/persons',(req,res,next)=>{
+  console.log("query",req.query)
+  //console.log("body",req.body)
+  next()
+})*/
+
+app.get('/api/persons',(req,res,next)=>{
+  const query = req.query
   connect().then(result=>{
-    Person.find({}).then(persons=>{
-        res.json(persons)      
-        closeConnection()       
-      }).catch(error=>{
-        next(error)
-      })
+    Person.find(query).then(persons=>{
+      res.json(persons)      
+      closeConnection()       
+    }).catch(error=>{
+      next(error)
+    })
   })  
 })
 
@@ -56,7 +63,24 @@ app.get('/api/persons/:id',(req,res,next)=>{
   }) 
 })
 
-app.delete('/api/persons/:id',(req,res)=>{
+app.put('/api/persons/:id',(req,res,next)=>{
+  const id = req.params.id
+  const update = req.body
+  connect().then(result=>{
+    Person.findByIdAndUpdate(id,update,{new:true}).then(person=>{
+      if(person){
+        res.json(person)
+      } else {
+        res.status(404).end()
+      }
+      closeConnection()
+    }).catch(error=>{
+      next(error)
+    })
+  })
+})
+
+app.delete('/api/persons/:id',(req,res,next)=>{
   const id = req.params.id
   connect().then(result=>{
     Person.findByIdAndDelete(id).then(result=>{ 
@@ -72,7 +96,7 @@ app.delete('/api/persons/:id',(req,res)=>{
   }) 
 })
 
-app.post('/api/persons',(req,res)=>{
+app.post('/api/persons',(req,res,next)=>{
   const newInfo = req.body
   connect().then(result=>{
     const person = new Person({

@@ -4,6 +4,14 @@ GET http://localhost:3001/api/persons
 ###
 GET http://localhost:3001/api/persons/61a6406d4937113bc79bc36
 ###
+PUT http://localhost:3001/api/persons/61a690cf56ec830a0b5f92c4
+Content-Type: application/json
+
+{
+    "name": "updated name",
+    "number": "0987654321"
+}
+###
 DELETE http://localhost:3001/api/persons/61a6406d4937113bc79bc365
 
 ###
